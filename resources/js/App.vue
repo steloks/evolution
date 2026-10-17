@@ -1,10 +1,13 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useRanking } from './composables/useRanking';
+import { useSystemInfo } from './composables/useSystemInfo';
 
 const props = defineProps({ firstDay: String, lastDay: String });
 
 const { hasData, range, fromHour, toHour, days, result, errors, loading, isAvailable, search } = useRanking(props.firstDay, props.lastDay);
+
+const { title: infoTitle, content: infoContent, open: infoOpen, showHealth, showMetrics } = useSystemInfo();
 
 const hourLabel = (hour) => `${String(hour).padStart(2, '0')}:00`;
 const fromHours = Array.from({ length: 24 }, (_, hour) => ({ label: hourLabel(hour), value: hour }));
@@ -23,7 +26,11 @@ onMounted(() => hasData && search());
 
 <template>
     <div class="q-pa-md" style="max-width: 860px; margin: 0 auto">
-        <div class="text-h4 q-mt-md">Clean Air Finder</div>
+        <div class="row items-center q-mt-md">
+            <div class="text-h4 col">Clean Air Finder</div>
+            <q-btn flat dense icon="monitor_heart" label="Health" @click="showHealth" />
+            <q-btn flat dense icon="query_stats" label="Metrics" @click="showMetrics" />
+        </div>
         <div class="text-grey-7">Bulgarian cities ranked by average PM2.5 for the chosen period.</div>
 
         <q-banner v-if="!hasData" class="bg-warning q-mt-md" rounded>
@@ -81,5 +88,17 @@ onMounted(() => hasData && search());
 
             <div class="text-caption text-grey-7 q-mt-sm">{{ result.hours }} hours, query took {{ result.query_ms }} ms.</div>
         </template>
+
+        <q-dialog v-model="infoOpen">
+            <q-card style="min-width: 360px; max-width: 90vw">
+                <q-card-section class="row items-center">
+                    <div class="text-h6 col">{{ infoTitle }}</div>
+                    <q-btn v-close-popup flat round dense icon="close" />
+                </q-card-section>
+                <q-card-section class="q-pt-none">
+                    <pre style="margin: 0; white-space: pre-wrap; font-size: 12px">{{ infoContent }}</pre>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
     </div>
 </template>
