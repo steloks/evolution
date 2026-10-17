@@ -8,4 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+Schedule::command('app:import-sensors')->dailyAt('00:00')->withoutOverlapping();
 Schedule::command('app:import-measurements')->hourlyAt(5)->withoutOverlapping();
