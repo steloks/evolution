@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RankingRequest;
+use App\Services\Metrics;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RankingController extends Controller
 {
     public const string TIMEZONE = 'Europe/Sofia';
 
-    public function __invoke(RankingRequest $request): JsonResponse
+    public function __invoke(RankingRequest $request, Metrics $metrics): JsonResponse
     {
         $from = CarbonImmutable::createFromFormat(RankingRequest::FORMAT, $request->validated('from'), self::TIMEZONE)->utc();
         $to = CarbonImmutable::createFromFormat(RankingRequest::FORMAT, $request->validated('to'), self::TIMEZONE)->utc();
@@ -30,6 +32,9 @@ class RankingController extends Controller
             ->get();
 
         $queryMs = round((hrtime(true) - $startedAt) / 1_000_000, 1);
+
+        $metrics->recordRanking($queryMs);
+        Log::info('Ranking served', ['from' => $from->toIso8601ZuluString(), 'to' => $to->toIso8601ZuluString(), 'cities' => $cities->count(), 'query_ms' => $queryMs]);
 
         return response()->json([
             'hours' => $hours,
