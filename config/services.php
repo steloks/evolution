@@ -28,6 +28,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'openaq' => [
+        'url' => env('OPENAQ_URL', 'https://api.openaq.org/v3'),
+        'key' => env('OPENAQ_API_KEY'),
+        'timeout' => (int) env('OPENAQ_TIMEOUT', 60),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
