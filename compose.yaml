@@ -1,3 +1,16 @@
+x-app: &app
+  build: .
+  environment:
+    APP_ENV: production
+    APP_KEY: base64:brwxjILO2CJTkUfuI4+Oa6rsO3UxSuqRQ/iZu8FxNyw=
+    LOG_CHANNEL: stderr
+    DB_CONNECTION: pgsql
+    DB_HOST: pgsql
+    DB_DATABASE: clean_air
+    DB_USERNAME: clean_air
+    DB_PASSWORD: secret
+    OPENAQ_API_KEY: 18b5ec96007c61af37993309fa6560fd7ab6335f1636b7e78ca25c1fa3dba431
+
 services:
   pgsql:
     image: postgres:17-alpine
@@ -9,7 +22,28 @@ services:
       - '5432:5432'
     volumes:
       - pgsql-data:/var/lib/postgresql/data
-      - ./docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/create-testing-database.sql
+    healthcheck:
+      test: pg_isready -U clean_air
+      interval: 5s
+
+  app:
+    <<: *app
+    command: sh -c 'php artisan migrate --force --seed && php artisan serve --host=0.0.0.0 --port=8000'
+    ports:
+      - '8000:8000'
+    depends_on:
+      pgsql:
+        condition: service_healthy
+    healthcheck:
+      test: wget -qO- http://127.0.0.1:8000/api/health
+      interval: 5s
+
+  scheduler:
+    <<: *app
+    command: sh -c 'php artisan app:import-sensors; php artisan app:import-measurements; php artisan schedule:work'
+    depends_on:
+      app:
+        condition: service_healthy
 
 volumes:
   pgsql-data:

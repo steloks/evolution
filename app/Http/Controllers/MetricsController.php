@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Measurement;
 use App\Models\Sensor;
 use App\Services\Metrics;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 
 class MetricsController extends Controller
 {
     public function __invoke(Metrics $metrics): Response
     {
-        $latest = Measurement::max('hour');
         $lastImport = $metrics->lastImport();
         $rankings = $metrics->rankings();
 
@@ -39,6 +37,6 @@ class MetricsController extends Controller
             $lines[] = "{$name} {$value}";
         }
 
-        return response(implode("\n", $lines) . "\n")->header('Content-Type', 'text/plain; version=0.0.4');
+        return response(implode("\n", $lines)."\n")->header('Content-Type', 'text/plain; version=0.0.4');
     }
 }
