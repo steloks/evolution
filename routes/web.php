@@ -11,6 +11,6 @@ Route::get('/', function () {
 
     return view('app', [
         'firstDay' => $first ? CarbonImmutable::parse($first, 'UTC')->setTimezone(RankingController::TIMEZONE)->format('Y/m/d') : null,
-        'lastDay' => $last ? CarbonImmutable::parse($last, 'UTC')->addHour()->setTimezone(RankingController::TIMEZONE)->format('Y/m/d') : null,
+        'lastDay' => $last ? CarbonImmutable::parse($last, 'UTC')->setTimezone(RankingController::TIMEZONE)->format('Y/m/d') : null,
     ]);
 });
