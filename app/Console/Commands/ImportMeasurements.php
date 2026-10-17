@@ -17,11 +17,18 @@ class ImportMeasurements extends Command
 {
     public function handle(SensorImporter $sensorImporter, MeasurementImporter $measurementImporter): int
     {
-        $this->info('Synced '.$sensorImporter->run().' sensors.');
+        $failed = 0;
+
+        try {
+            $this->info('Synced '.$sensorImporter->run().' sensors.');
+        } catch (Throwable $exception) {
+            $failed++;
+            report($exception);
+            $this->warn('Sensor sync failed, using the sensors already stored.');
+        }
 
         $to = CarbonImmutable::now('UTC')->startOfHour();
         $stored = 0;
-        $failed = 0;
 
         foreach (Sensor::all() as $sensor) {
             try {
@@ -32,7 +39,7 @@ class ImportMeasurements extends Command
             }
         }
 
-        $this->info("Stored {$stored} measurements, {$failed} sensors failed.");
+        $this->info("Stored {$stored} measurements, {$failed} failures.");
 
         return $failed === 0 ? self::SUCCESS : self::FAILURE;
     }
