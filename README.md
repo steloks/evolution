@@ -16,9 +16,10 @@ The OpenAQ API key and the app key are written straight into `compose.yaml` so t
 
 ## How it works
 
-Three containers:
+Four containers:
 
 - `pgsql` - Postgres 17, the data lives in a volume.
+- `tests` - runs the test suite first. The app does not start if a test fails.
 - `app` - runs the migrations and the city seeder, then serves the page and the API.
 - `scheduler` - imports sensors and measurements once on start, then runs the Laravel scheduler:
   - `app:import-sensors` every day at 00:00 UTC
