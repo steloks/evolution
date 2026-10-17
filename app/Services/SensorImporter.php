@@ -6,9 +6,9 @@ use App\Models\City;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Collection;
 
-class SensorSync
+class SensorImporter
 {
-    public function __construct(private OpenAq $openAq) {}
+    public function __construct(private OpenAqClient $openAq) {}
 
     public function run(): int
     {
@@ -30,7 +30,7 @@ class SensorSync
             }
 
             foreach (data_get($location, 'sensors', []) as $sensor) {
-                if (data_get($sensor, 'parameter.id') !== OpenAq::PM25_PARAMETER_ID || ! is_numeric(data_get($sensor, 'id'))) {
+                if (data_get($sensor, 'parameter.id') !== OpenAqClient::PM25_PARAMETER_ID || ! is_numeric(data_get($sensor, 'id'))) {
                     continue;
                 }
 

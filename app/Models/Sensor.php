@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['id', 'location_name', 'provider', 'latitude', 'longitude', 'city_id'])]
+#[Fillable(['id', 'location_name', 'provider', 'latitude', 'longitude', 'city_id', 'imported_until'])]
 class Sensor extends Model
 {
     /** @use HasFactory<SensorFactory> */
@@ -22,6 +22,7 @@ class Sensor extends Model
         return [
             'latitude' => 'float',
             'longitude' => 'float',
+            'imported_until' => 'immutable_datetime',
         ];
     }
 
